@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% block contenido %}
+<h3>Buscar alumnos</h3>
+<form><input name="q" value="{{ q }}" placeholder="nombre"><button>Buscar</button></form>
+{# SEGURO: Jinja2 escapa automáticamente {{ q }} (< se convierte en &lt;) #}
+<p>Resultados para: {{ q }}</p>
+{% if error %}<p class="err">{{ error }}</p>{% endif %}
+<table><tr><th>Matrícula</th><th>Nombre</th><th>Carrera</th></tr>
+{% for f in filas %}<tr><td>{{ f[0] }}</td><td>{{ f[1] }}</td><td>{{ f[2] }}</td></tr>{% endfor %}</table>
+{% endblock %}

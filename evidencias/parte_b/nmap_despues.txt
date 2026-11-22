@@ -1,0 +1,309 @@
+##### Escaneo desde VLAN40-Laboratorios (10.10.40.50) · despues
+##### nmap -sT -Pn -n --max-retries 1 --host-timeout 30s -p 22,53,80,88,389,443,445,464,636,1514,1515,3389,5432,8006,8007 10.10.10.10,20,30,40 10.10.15.10
+Nmap scan report for 10.10.10.10
+Host is up (0.000065s latency).
+
+PORT     STATE    SERVICE
+22/tcp   filtered ssh
+53/tcp   open     domain
+80/tcp   filtered http
+88/tcp   open     kerberos-sec
+389/tcp  open     ldap
+443/tcp  filtered https
+445/tcp  open     microsoft-ds
+464/tcp  open     kpasswd5
+636/tcp  open     ldapssl
+1514/tcp filtered fujitsu-dtcns
+1515/tcp filtered ifor-protocol
+3389/tcp filtered ms-wbt-server
+5432/tcp filtered postgresql
+8006/tcp filtered wpl-analytics
+8007/tcp filtered ajp12
+
+Nmap scan report for 10.10.10.20
+Host is up.
+
+PORT     STATE    SERVICE
+22/tcp   filtered ssh
+53/tcp   filtered domain
+80/tcp   filtered http
+88/tcp   filtered kerberos-sec
+389/tcp  filtered ldap
+443/tcp  filtered https
+445/tcp  filtered microsoft-ds
+464/tcp  filtered kpasswd5
+636/tcp  filtered ldapssl
+1514/tcp filtered fujitsu-dtcns
+1515/tcp filtered ifor-protocol
+3389/tcp filtered ms-wbt-server
+5432/tcp filtered postgresql
+8006/tcp filtered wpl-analytics
+8007/tcp filtered ajp12
+
+Nmap scan report for 10.10.10.30
+Host is up.
+
+PORT     STATE    SERVICE
+22/tcp   filtered ssh
+53/tcp   filtered domain
+80/tcp   filtered http
+88/tcp   filtered kerberos-sec
+389/tcp  filtered ldap
+443/tcp  filtered https
+445/tcp  filtered microsoft-ds
+464/tcp  filtered kpasswd5
+636/tcp  filtered ldapssl
+1514/tcp filtered fujitsu-dtcns
+1515/tcp filtered ifor-protocol
+3389/tcp filtered ms-wbt-server
+5432/tcp filtered postgresql
+8006/tcp filtered wpl-analytics
+8007/tcp filtered ajp12
+
+Nmap scan report for 10.10.10.40
+Host is up.
+
+PORT     STATE    SERVICE
+22/tcp   filtered ssh
+53/tcp   filtered domain
+80/tcp   filtered http
+88/tcp   filtered kerberos-sec
+389/tcp  filtered ldap
+443/tcp  filtered https
+445/tcp  filtered microsoft-ds
+464/tcp  filtered kpasswd5
+636/tcp  filtered ldapssl
+1514/tcp filtered fujitsu-dtcns
+1515/tcp filtered ifor-protocol
+3389/tcp filtered ms-wbt-server
+5432/tcp filtered postgresql
+8006/tcp filtered wpl-analytics
+8007/tcp filtered ajp12
+
+Nmap scan report for 10.10.15.10
+Host is up.
+
+PORT     STATE    SERVICE
+22/tcp   filtered ssh
+53/tcp   filtered domain
+80/tcp   filtered http
+88/tcp   filtered kerberos-sec
+389/tcp  filtered ldap
+443/tcp  filtered https
+445/tcp  filtered microsoft-ds
+464/tcp  filtered kpasswd5
+636/tcp  filtered ldapssl
+1514/tcp filtered fujitsu-dtcns
+1515/tcp filtered ifor-protocol
+3389/tcp filtered ms-wbt-server
+5432/tcp filtered postgresql
+8006/tcp filtered wpl-analytics
+8007/tcp filtered ajp12
+
+
+##### Escaneo desde VLAN20-Administrativos (10.10.20.50) · despues
+##### nmap -sT -Pn -n --max-retries 1 --host-timeout 30s -p 22,53,80,88,389,443,445,464,636,1514,1515,3389,5432,8006,8007 10.10.10.10,20,30,40 10.10.15.10
+Nmap scan report for 10.10.10.10
+Host is up (0.00011s latency).
+
+PORT     STATE    SERVICE
+22/tcp   filtered ssh
+53/tcp   open     domain
+80/tcp   filtered http
+88/tcp   open     kerberos-sec
+389/tcp  open     ldap
+443/tcp  filtered https
+445/tcp  open     microsoft-ds
+464/tcp  open     kpasswd5
+636/tcp  open     ldapssl
+1514/tcp filtered fujitsu-dtcns
+1515/tcp filtered ifor-protocol
+3389/tcp filtered ms-wbt-server
+5432/tcp filtered postgresql
+8006/tcp filtered wpl-analytics
+8007/tcp filtered ajp12
+
+Nmap scan report for 10.10.10.20
+Host is up (0.000049s latency).
+
+PORT     STATE    SERVICE
+22/tcp   filtered ssh
+53/tcp   filtered domain
+80/tcp   filtered http
+88/tcp   filtered kerberos-sec
+389/tcp  filtered ldap
+443/tcp  filtered https
+445/tcp  open     microsoft-ds
+464/tcp  filtered kpasswd5
+636/tcp  filtered ldapssl
+1514/tcp filtered fujitsu-dtcns
+1515/tcp filtered ifor-protocol
+3389/tcp filtered ms-wbt-server
+5432/tcp filtered postgresql
+8006/tcp filtered wpl-analytics
+8007/tcp filtered ajp12
+
+Nmap scan report for 10.10.10.30
+Host is up (0.00027s latency).
+
+PORT     STATE    SERVICE
+22/tcp   filtered ssh
+53/tcp   filtered domain
+80/tcp   filtered http
+88/tcp   filtered kerberos-sec
+389/tcp  filtered ldap
+443/tcp  open     https
+445/tcp  filtered microsoft-ds
+464/tcp  filtered kpasswd5
+636/tcp  filtered ldapssl
+1514/tcp filtered fujitsu-dtcns
+1515/tcp filtered ifor-protocol
+3389/tcp filtered ms-wbt-server
+5432/tcp filtered postgresql
+8006/tcp filtered wpl-analytics
+8007/tcp filtered ajp12
+
+Nmap scan report for 10.10.10.40
+Host is up.
+
+PORT     STATE    SERVICE
+22/tcp   filtered ssh
+53/tcp   filtered domain
+80/tcp   filtered http
+88/tcp   filtered kerberos-sec
+389/tcp  filtered ldap
+443/tcp  filtered https
+445/tcp  filtered microsoft-ds
+464/tcp  filtered kpasswd5
+636/tcp  filtered ldapssl
+1514/tcp filtered fujitsu-dtcns
+1515/tcp filtered ifor-protocol
+3389/tcp filtered ms-wbt-server
+5432/tcp filtered postgresql
+8006/tcp filtered wpl-analytics
+8007/tcp filtered ajp12
+
+Nmap scan report for 10.10.15.10
+Host is up.
+
+PORT     STATE    SERVICE
+22/tcp   filtered ssh
+53/tcp   filtered domain
+80/tcp   filtered http
+88/tcp   filtered kerberos-sec
+389/tcp  filtered ldap
+443/tcp  filtered https
+445/tcp  filtered microsoft-ds
+464/tcp  filtered kpasswd5
+636/tcp  filtered ldapssl
+1514/tcp filtered fujitsu-dtcns
+1515/tcp filtered ifor-protocol
+3389/tcp filtered ms-wbt-server
+5432/tcp filtered postgresql
+8006/tcp filtered wpl-analytics
+8007/tcp filtered ajp12
+
+
+##### Escaneo desde VLAN99-Gestion-TI (10.10.99.50) · despues
+##### nmap -sT -Pn -n --max-retries 1 --host-timeout 30s -p 22,53,80,88,389,443,445,464,636,1514,1515,3389,5432,8006,8007 10.10.10.10,20,30,40 10.10.15.10
+Nmap scan report for 10.10.10.10
+Host is up (0.00011s latency).
+
+PORT     STATE    SERVICE
+22/tcp   open     ssh
+53/tcp   filtered domain
+80/tcp   filtered http
+88/tcp   filtered kerberos-sec
+389/tcp  filtered ldap
+443/tcp  closed   https
+445/tcp  filtered microsoft-ds
+464/tcp  filtered kpasswd5
+636/tcp  filtered ldapssl
+1514/tcp filtered fujitsu-dtcns
+1515/tcp filtered ifor-protocol
+3389/tcp filtered ms-wbt-server
+5432/tcp filtered postgresql
+8006/tcp closed   wpl-analytics
+8007/tcp filtered ajp12
+
+Nmap scan report for 10.10.10.20
+Host is up (0.00026s latency).
+
+PORT     STATE    SERVICE
+22/tcp   open     ssh
+53/tcp   filtered domain
+80/tcp   filtered http
+88/tcp   filtered kerberos-sec
+389/tcp  filtered ldap
+443/tcp  closed   https
+445/tcp  filtered microsoft-ds
+464/tcp  filtered kpasswd5
+636/tcp  filtered ldapssl
+1514/tcp filtered fujitsu-dtcns
+1515/tcp filtered ifor-protocol
+3389/tcp filtered ms-wbt-server
+5432/tcp filtered postgresql
+8006/tcp closed   wpl-analytics
+8007/tcp filtered ajp12
+
+Nmap scan report for 10.10.10.30
+Host is up (0.00016s latency).
+
+PORT     STATE    SERVICE
+22/tcp   open     ssh
+53/tcp   filtered domain
+80/tcp   filtered http
+88/tcp   filtered kerberos-sec
+389/tcp  filtered ldap
+443/tcp  open     https
+445/tcp  filtered microsoft-ds
+464/tcp  filtered kpasswd5
+636/tcp  filtered ldapssl
+1514/tcp filtered fujitsu-dtcns
+1515/tcp filtered ifor-protocol
+3389/tcp filtered ms-wbt-server
+5432/tcp filtered postgresql
+8006/tcp closed   wpl-analytics
+8007/tcp filtered ajp12
+
+Nmap scan report for 10.10.10.40
+Host is up (0.00013s latency).
+
+PORT     STATE    SERVICE
+22/tcp   open     ssh
+53/tcp   filtered domain
+80/tcp   filtered http
+88/tcp   filtered kerberos-sec
+389/tcp  filtered ldap
+443/tcp  open     https
+445/tcp  filtered microsoft-ds
+464/tcp  filtered kpasswd5
+636/tcp  filtered ldapssl
+1514/tcp filtered fujitsu-dtcns
+1515/tcp filtered ifor-protocol
+3389/tcp filtered ms-wbt-server
+5432/tcp filtered postgresql
+8006/tcp closed   wpl-analytics
+8007/tcp filtered ajp12
+
+Nmap scan report for 10.10.15.10
+Host is up (0.00034s latency).
+
+PORT     STATE    SERVICE
+22/tcp   open     ssh
+53/tcp   filtered domain
+80/tcp   filtered http
+88/tcp   filtered kerberos-sec
+389/tcp  filtered ldap
+443/tcp  filtered https
+445/tcp  filtered microsoft-ds
+464/tcp  filtered kpasswd5
+636/tcp  filtered ldapssl
+1514/tcp filtered fujitsu-dtcns
+1515/tcp filtered ifor-protocol
+3389/tcp filtered ms-wbt-server
+5432/tcp filtered postgresql
+8006/tcp filtered wpl-analytics
+8007/tcp open     ajp12
+
+

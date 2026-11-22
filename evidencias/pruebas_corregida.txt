@@ -1,0 +1,23 @@
+== Pruebas contra http://127.0.0.1:5001 (versión corregida) ==
+
+[PROTEGIDA ] SQL Injection · Comilla simple en /buscar?q='
+             HTTP 200; mensaje de error SQL visible: no
+[PROTEGIDA ] SQL Injection · Condición siempre verdadera  zzz' OR 1=1--
+             HTTP 200; filas devueltas: 0 (la búsqueda 'zzz' no debería devolver ninguna)
+[PROTEGIDA ] SQL Injection · UNION SELECT sobre la tabla usuarios
+             HTTP 200; usuarios y hashes de contraseña expuestos: no
+[PROTEGIDA ] XSS · XSS reflejado en /buscar
+             script sin escapar en la respuesta: no; CSP: default-src 'self'; script-src 'self'; s
+[PROTEGIDA ] XSS · XSS almacenado en /avisos
+             el aviso se muestra escapado como texto (&lt;img ...&gt;)
+[PROTEGIDA ] IDOR/BOLA · Control positivo: al_laura abre SU expediente AL00000001
+             HTTP 200 (debe ser 200 en ambas versiones)
+[PROTEGIDA ] IDOR/BOLA · al_laura abre el expediente de otro alumno AL00000002
+             HTTP 403; datos de Diego (CURP, teléfono, beca) visibles: no
+[PROTEGIDA ] IDOR/BOLA · API: al_laura pide calificaciones de AL00000003 (menor de edad)
+             HTTP 403; cuerpo: {"error":"prohibido"}
+
+Generando eventos controlados para la bitácora...
+Listo. Revise logs/seguridad.log (solo la versión corregida lo genera).
+
+Resumen: 0 pruebas vulnerables de 8 (incluye 1 control positivo).

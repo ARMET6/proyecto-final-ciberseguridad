@@ -1,0 +1,20 @@
+Bitácora: evidencias/seguridad_durante_zap.log  ·  894 eventos  ·  2026-11-22T17:38:51 → 2026-11-22T17:39:02
+
+Eventos por tipo:
+  AVISO_PUBLICADO          354
+  ENTRADA_SOSPECHOSA       318
+  RECURSO_NO_ENCONTRADO    200
+  EXPEDIENTE_CONSULTADO    17
+  ENTRADA_INVALIDA         4
+  LOGIN_OK                 1
+
+Eventos por nivel: {'INFO': 572, 'WARNING': 322}
+
+Alertas generadas (7):
+  - R5 ESCANEO AUTOMATIZADO: 318 entradas sospechosas en ráfaga (usuarios ['doc_maria']); se muestran 5 de ejemplo
+  - R3 INYECCIÓN: 'doc_maria' envió en 'q': 5;URL='https://109420124815901420.owasp.org'
+  - R3 INYECCIÓN: 'doc_maria' envió en 'q': URL='http://109420124815901420.owasp.org'
+  - R3 INYECCIÓN: 'doc_maria' envió en 'contenido': 5;URL='https://109420124815901420.owasp.org'
+  - R3 INYECCIÓN: 'doc_maria' envió en 'contenido': URL='http://109420124815901420.owasp.org'
+  - R3 INYECCIÓN: 'doc_maria' envió en 'contenido': <!--#EXEC cmd="ls /"-->
+  - R4 SONDEO: 204 solicitudes inválidas desde 127.0.0.1

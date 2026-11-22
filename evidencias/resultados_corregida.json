@@ -1,0 +1,54 @@
+{
+  "url": "http://127.0.0.1:5001",
+  "version": "corregida",
+  "resultados": [
+    {
+      "vulnerabilidad": "SQL Injection",
+      "prueba": "Comilla simple en /buscar?q='",
+      "resultado": "PROTEGIDA",
+      "detalle": "HTTP 200; mensaje de error SQL visible: no"
+    },
+    {
+      "vulnerabilidad": "SQL Injection",
+      "prueba": "Condición siempre verdadera  zzz' OR 1=1--",
+      "resultado": "PROTEGIDA",
+      "detalle": "HTTP 200; filas devueltas: 0 (la búsqueda 'zzz' no debería devolver ninguna)"
+    },
+    {
+      "vulnerabilidad": "SQL Injection",
+      "prueba": "UNION SELECT sobre la tabla usuarios",
+      "resultado": "PROTEGIDA",
+      "detalle": "HTTP 200; usuarios y hashes de contraseña expuestos: no"
+    },
+    {
+      "vulnerabilidad": "XSS",
+      "prueba": "XSS reflejado en /buscar",
+      "resultado": "PROTEGIDA",
+      "detalle": "script sin escapar en la respuesta: no; CSP: default-src 'self'; script-src 'self'; s"
+    },
+    {
+      "vulnerabilidad": "XSS",
+      "prueba": "XSS almacenado en /avisos",
+      "resultado": "PROTEGIDA",
+      "detalle": "el aviso se muestra escapado como texto (&lt;img ...&gt;)"
+    },
+    {
+      "vulnerabilidad": "IDOR/BOLA",
+      "prueba": "Control positivo: al_laura abre SU expediente AL00000001",
+      "resultado": "PROTEGIDA",
+      "detalle": "HTTP 200 (debe ser 200 en ambas versiones)"
+    },
+    {
+      "vulnerabilidad": "IDOR/BOLA",
+      "prueba": "al_laura abre el expediente de otro alumno AL00000002",
+      "resultado": "PROTEGIDA",
+      "detalle": "HTTP 403; datos de Diego (CURP, teléfono, beca) visibles: no"
+    },
+    {
+      "vulnerabilidad": "IDOR/BOLA",
+      "prueba": "API: al_laura pide calificaciones de AL00000003 (menor de edad)",
+      "resultado": "PROTEGIDA",
+      "detalle": "HTTP 403; cuerpo: {\"error\":\"prohibido\"}"
+    }
+  ]
+}

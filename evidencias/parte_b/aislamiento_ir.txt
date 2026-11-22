@@ -1,0 +1,18 @@
+== Antes de aislar ==
+  adm -> 10.10.10.20:445  PERMITIDO
+  adm -> 10.10.10.10:389  PERMITIDO
+  ti -> 10.10.10.20:22  PERMITIDO
+
+== sudo bash parte_b/laboratorio_red.sh aislar adm ==
+Segmento VLAN20-Administrativos aislado (todo su tráfico hacia y desde otras VLANs se descarta).
+		ip daddr 10.10.20.0/24 counter packets 0 bytes 0 drop comment "IR-AISLAR-adm"
+		ip saddr 10.10.20.0/24 counter packets 0 bytes 0 drop comment "IR-AISLAR-adm"
+
+== Con la VLAN 20 aislada ==
+  adm -> 10.10.10.20:445  BLOQUEADO
+  adm -> 10.10.10.10:389  BLOQUEADO
+  ti -> 10.10.10.20:22  PERMITIDO
+
+== desaislar ==
+Reglas de aislamiento eliminadas.
+  adm -> 10.10.10.20:445  PERMITIDO

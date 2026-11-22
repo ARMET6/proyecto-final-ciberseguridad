@@ -1,0 +1,23 @@
+== Pruebas contra http://127.0.0.1:5000 (versión vulnerable) ==
+
+[VULNERABLE] SQL Injection · Comilla simple en /buscar?q='
+             HTTP 200; mensaje de error SQL visible: sí
+[VULNERABLE] SQL Injection · Condición siempre verdadera  zzz' OR 1=1--
+             HTTP 200; filas devueltas: 4 (la búsqueda 'zzz' no debería devolver ninguna)
+[VULNERABLE] SQL Injection · UNION SELECT sobre la tabla usuarios
+             HTTP 200; usuarios y hashes de contraseña expuestos: sí
+[VULNERABLE] XSS · XSS reflejado en /buscar
+             script sin escapar en la respuesta: sí; CSP: ausente
+[VULNERABLE] XSS · XSS almacenado en /avisos
+             etiqueta <img onerror> guardada y servida como HTML
+[PROTEGIDA ] IDOR/BOLA · Control positivo: al_laura abre SU expediente AL00000001
+             HTTP 200 (debe ser 200 en ambas versiones)
+[VULNERABLE] IDOR/BOLA · al_laura abre el expediente de otro alumno AL00000002
+             HTTP 200; datos de Diego (CURP, teléfono, beca) visibles: sí
+[VULNERABLE] IDOR/BOLA · API: al_laura pide calificaciones de AL00000003 (menor de edad)
+             HTTP 200; cuerpo: {"calificaciones":[{"calificacion":90,"materia":"Matem\u00e1ticas I"}],"matricul
+
+Generando eventos controlados para la bitácora...
+Listo. Revise logs/seguridad.log (solo la versión corregida lo genera).
+
+Resumen: 7 pruebas vulnerables de 8 (incluye 1 control positivo).

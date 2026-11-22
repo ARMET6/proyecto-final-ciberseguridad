@@ -1,0 +1,309 @@
+##### Escaneo desde VLAN40-Laboratorios (10.10.40.50) · antes
+##### nmap -sT -Pn -n --max-retries 1 --host-timeout 30s -p 22,53,80,88,389,443,445,464,636,1514,1515,3389,5432,8006,8007 10.10.10.10,20,30,40 10.10.15.10
+Nmap scan report for 10.10.10.10
+Host is up (0.00065s latency).
+
+PORT     STATE  SERVICE
+22/tcp   open   ssh
+53/tcp   open   domain
+80/tcp   closed http
+88/tcp   open   kerberos-sec
+389/tcp  open   ldap
+443/tcp  closed https
+445/tcp  open   microsoft-ds
+464/tcp  open   kpasswd5
+636/tcp  open   ldapssl
+1514/tcp closed fujitsu-dtcns
+1515/tcp closed ifor-protocol
+3389/tcp closed ms-wbt-server
+5432/tcp closed postgresql
+8006/tcp closed wpl-analytics
+8007/tcp closed ajp12
+
+Nmap scan report for 10.10.10.20
+Host is up (0.00080s latency).
+
+PORT     STATE  SERVICE
+22/tcp   open   ssh
+53/tcp   closed domain
+80/tcp   closed http
+88/tcp   closed kerberos-sec
+389/tcp  closed ldap
+443/tcp  closed https
+445/tcp  open   microsoft-ds
+464/tcp  closed kpasswd5
+636/tcp  closed ldapssl
+1514/tcp closed fujitsu-dtcns
+1515/tcp closed ifor-protocol
+3389/tcp closed ms-wbt-server
+5432/tcp closed postgresql
+8006/tcp closed wpl-analytics
+8007/tcp closed ajp12
+
+Nmap scan report for 10.10.10.30
+Host is up (0.00080s latency).
+
+PORT     STATE  SERVICE
+22/tcp   open   ssh
+53/tcp   closed domain
+80/tcp   closed http
+88/tcp   closed kerberos-sec
+389/tcp  closed ldap
+443/tcp  open   https
+445/tcp  closed microsoft-ds
+464/tcp  closed kpasswd5
+636/tcp  closed ldapssl
+1514/tcp closed fujitsu-dtcns
+1515/tcp closed ifor-protocol
+3389/tcp closed ms-wbt-server
+5432/tcp open   postgresql
+8006/tcp closed wpl-analytics
+8007/tcp closed ajp12
+
+Nmap scan report for 10.10.10.40
+Host is up (0.00052s latency).
+
+PORT     STATE  SERVICE
+22/tcp   open   ssh
+53/tcp   closed domain
+80/tcp   closed http
+88/tcp   closed kerberos-sec
+389/tcp  closed ldap
+443/tcp  open   https
+445/tcp  closed microsoft-ds
+464/tcp  closed kpasswd5
+636/tcp  closed ldapssl
+1514/tcp open   fujitsu-dtcns
+1515/tcp open   ifor-protocol
+3389/tcp closed ms-wbt-server
+5432/tcp closed postgresql
+8006/tcp closed wpl-analytics
+8007/tcp closed ajp12
+
+Nmap scan report for 10.10.15.10
+Host is up (0.00082s latency).
+
+PORT     STATE  SERVICE
+22/tcp   open   ssh
+53/tcp   closed domain
+80/tcp   closed http
+88/tcp   closed kerberos-sec
+389/tcp  closed ldap
+443/tcp  closed https
+445/tcp  closed microsoft-ds
+464/tcp  closed kpasswd5
+636/tcp  closed ldapssl
+1514/tcp closed fujitsu-dtcns
+1515/tcp closed ifor-protocol
+3389/tcp closed ms-wbt-server
+5432/tcp closed postgresql
+8006/tcp closed wpl-analytics
+8007/tcp open   ajp12
+
+
+##### Escaneo desde VLAN20-Administrativos (10.10.20.50) · antes
+##### nmap -sT -Pn -n --max-retries 1 --host-timeout 30s -p 22,53,80,88,389,443,445,464,636,1514,1515,3389,5432,8006,8007 10.10.10.10,20,30,40 10.10.15.10
+Nmap scan report for 10.10.10.10
+Host is up (0.00016s latency).
+
+PORT     STATE  SERVICE
+22/tcp   open   ssh
+53/tcp   open   domain
+80/tcp   closed http
+88/tcp   open   kerberos-sec
+389/tcp  open   ldap
+443/tcp  closed https
+445/tcp  open   microsoft-ds
+464/tcp  open   kpasswd5
+636/tcp  open   ldapssl
+1514/tcp closed fujitsu-dtcns
+1515/tcp closed ifor-protocol
+3389/tcp closed ms-wbt-server
+5432/tcp closed postgresql
+8006/tcp closed wpl-analytics
+8007/tcp closed ajp12
+
+Nmap scan report for 10.10.10.20
+Host is up (0.00017s latency).
+
+PORT     STATE  SERVICE
+22/tcp   open   ssh
+53/tcp   closed domain
+80/tcp   closed http
+88/tcp   closed kerberos-sec
+389/tcp  closed ldap
+443/tcp  closed https
+445/tcp  open   microsoft-ds
+464/tcp  closed kpasswd5
+636/tcp  closed ldapssl
+1514/tcp closed fujitsu-dtcns
+1515/tcp closed ifor-protocol
+3389/tcp closed ms-wbt-server
+5432/tcp closed postgresql
+8006/tcp closed wpl-analytics
+8007/tcp closed ajp12
+
+Nmap scan report for 10.10.10.30
+Host is up (0.00016s latency).
+
+PORT     STATE  SERVICE
+22/tcp   open   ssh
+53/tcp   closed domain
+80/tcp   closed http
+88/tcp   closed kerberos-sec
+389/tcp  closed ldap
+443/tcp  open   https
+445/tcp  closed microsoft-ds
+464/tcp  closed kpasswd5
+636/tcp  closed ldapssl
+1514/tcp closed fujitsu-dtcns
+1515/tcp closed ifor-protocol
+3389/tcp closed ms-wbt-server
+5432/tcp open   postgresql
+8006/tcp closed wpl-analytics
+8007/tcp closed ajp12
+
+Nmap scan report for 10.10.10.40
+Host is up (0.00015s latency).
+
+PORT     STATE  SERVICE
+22/tcp   open   ssh
+53/tcp   closed domain
+80/tcp   closed http
+88/tcp   closed kerberos-sec
+389/tcp  closed ldap
+443/tcp  open   https
+445/tcp  closed microsoft-ds
+464/tcp  closed kpasswd5
+636/tcp  closed ldapssl
+1514/tcp open   fujitsu-dtcns
+1515/tcp open   ifor-protocol
+3389/tcp closed ms-wbt-server
+5432/tcp closed postgresql
+8006/tcp closed wpl-analytics
+8007/tcp closed ajp12
+
+Nmap scan report for 10.10.15.10
+Host is up (0.00018s latency).
+
+PORT     STATE  SERVICE
+22/tcp   open   ssh
+53/tcp   closed domain
+80/tcp   closed http
+88/tcp   closed kerberos-sec
+389/tcp  closed ldap
+443/tcp  closed https
+445/tcp  closed microsoft-ds
+464/tcp  closed kpasswd5
+636/tcp  closed ldapssl
+1514/tcp closed fujitsu-dtcns
+1515/tcp closed ifor-protocol
+3389/tcp closed ms-wbt-server
+5432/tcp closed postgresql
+8006/tcp closed wpl-analytics
+8007/tcp open   ajp12
+
+
+##### Escaneo desde VLAN99-Gestion-TI (10.10.99.50) · antes
+##### nmap -sT -Pn -n --max-retries 1 --host-timeout 30s -p 22,53,80,88,389,443,445,464,636,1514,1515,3389,5432,8006,8007 10.10.10.10,20,30,40 10.10.15.10
+Nmap scan report for 10.10.10.10
+Host is up (0.00040s latency).
+
+PORT     STATE  SERVICE
+22/tcp   open   ssh
+53/tcp   open   domain
+80/tcp   closed http
+88/tcp   open   kerberos-sec
+389/tcp  open   ldap
+443/tcp  closed https
+445/tcp  open   microsoft-ds
+464/tcp  open   kpasswd5
+636/tcp  open   ldapssl
+1514/tcp closed fujitsu-dtcns
+1515/tcp closed ifor-protocol
+3389/tcp closed ms-wbt-server
+5432/tcp closed postgresql
+8006/tcp closed wpl-analytics
+8007/tcp closed ajp12
+
+Nmap scan report for 10.10.10.20
+Host is up (0.00033s latency).
+
+PORT     STATE  SERVICE
+22/tcp   open   ssh
+53/tcp   closed domain
+80/tcp   closed http
+88/tcp   closed kerberos-sec
+389/tcp  closed ldap
+443/tcp  closed https
+445/tcp  open   microsoft-ds
+464/tcp  closed kpasswd5
+636/tcp  closed ldapssl
+1514/tcp closed fujitsu-dtcns
+1515/tcp closed ifor-protocol
+3389/tcp closed ms-wbt-server
+5432/tcp closed postgresql
+8006/tcp closed wpl-analytics
+8007/tcp closed ajp12
+
+Nmap scan report for 10.10.10.30
+Host is up (0.00029s latency).
+
+PORT     STATE  SERVICE
+22/tcp   open   ssh
+53/tcp   closed domain
+80/tcp   closed http
+88/tcp   closed kerberos-sec
+389/tcp  closed ldap
+443/tcp  open   https
+445/tcp  closed microsoft-ds
+464/tcp  closed kpasswd5
+636/tcp  closed ldapssl
+1514/tcp closed fujitsu-dtcns
+1515/tcp closed ifor-protocol
+3389/tcp closed ms-wbt-server
+5432/tcp open   postgresql
+8006/tcp closed wpl-analytics
+8007/tcp closed ajp12
+
+Nmap scan report for 10.10.10.40
+Host is up (0.00028s latency).
+
+PORT     STATE  SERVICE
+22/tcp   open   ssh
+53/tcp   closed domain
+80/tcp   closed http
+88/tcp   closed kerberos-sec
+389/tcp  closed ldap
+443/tcp  open   https
+445/tcp  closed microsoft-ds
+464/tcp  closed kpasswd5
+636/tcp  closed ldapssl
+1514/tcp open   fujitsu-dtcns
+1515/tcp open   ifor-protocol
+3389/tcp closed ms-wbt-server
+5432/tcp closed postgresql
+8006/tcp closed wpl-analytics
+8007/tcp closed ajp12
+
+Nmap scan report for 10.10.15.10
+Host is up (0.00045s latency).
+
+PORT     STATE  SERVICE
+22/tcp   open   ssh
+53/tcp   closed domain
+80/tcp   closed http
+88/tcp   closed kerberos-sec
+389/tcp  closed ldap
+443/tcp  closed https
+445/tcp  closed microsoft-ds
+464/tcp  closed kpasswd5
+636/tcp  closed ldapssl
+1514/tcp closed fujitsu-dtcns
+1515/tcp closed ifor-protocol
+3389/tcp closed ms-wbt-server
+5432/tcp closed postgresql
+8006/tcp closed wpl-analytics
+8007/tcp open   ajp12
+
+

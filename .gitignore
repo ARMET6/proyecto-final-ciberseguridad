@@ -1,0 +1,10 @@
+# Datos y secretos de laboratorio (se regeneran con init_db.py)
+parte_a/instance/
+parte_a/logs/
+*.db
+.env
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/

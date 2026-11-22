@@ -1,0 +1,26 @@
+ORIGEN DESTINO         PUERTO ESPERADO   OBTENIDO   OK   JUSTIFICACION
+adm    10.10.10.10     389    PERMITIDO  PERMITIDO  SI   Administrativo inicia sesión en el dominio (R01)
+adm    10.10.10.20     445    PERMITIDO  PERMITIDO  SI   Administrativo abre carpetas en VM-FS01 (R02)
+adm    10.10.10.30     443    PERMITIDO  PERMITIDO  SI   Administrativo usa las aplicaciones web (R03)
+adm    10.10.10.30     5432   BLOQUEADO  PERMITIDO  NO   Nadie fuera de servidores habla directo con PostgreSQL
+adm    10.10.10.20     22     BLOQUEADO  PERMITIDO  NO   SSH solo desde Gestión TI
+adm    10.10.15.10     8007   BLOQUEADO  PERMITIDO  NO   Usuarios no alcanzan el servidor de respaldos (B02)
+adm    203.0.113.10    443    PERMITIDO  PERMITIDO  SI   Navegación web (R05)
+lab    10.10.10.10     88     PERMITIDO  PERMITIDO  SI   Equipo de laboratorio inicia sesión con Kerberos (R04)
+lab    10.10.10.20     445    BLOQUEADO  PERMITIDO  NO   Ransomware en laboratorio NO llega a expedientes (B01)
+lab    10.10.10.30     443    BLOQUEADO  PERMITIDO  NO   Laboratorio no usa aplicaciones administrativas
+lab    10.10.10.40     1514   BLOQUEADO  PERMITIDO  NO   Laboratorio no habla con el monitoreo
+lab    10.10.15.10     8007   BLOQUEADO  PERMITIDO  NO   Ransomware NO llega a los respaldos (B02)
+lab    10.10.15.10     22     BLOQUEADO  PERMITIDO  NO   Ni por SSH
+lab    203.0.113.10    443    PERMITIDO  PERMITIDO  SI   Internet para clases (R05)
+lab    203.0.113.10    22     BLOQUEADO  PERMITIDO  NO   Sin SSH saliente desde laboratorios
+ti     10.10.10.20     22     PERMITIDO  PERMITIDO  SI   TI administra servidores por SSH (R06)
+ti     10.10.10.40     443    PERMITIDO  PERMITIDO  SI   TI consulta Wazuh (R06)
+ti     10.10.15.10     8007   PERMITIDO  PERMITIDO  SI   TI administra Proxmox Backup Server (R07)
+ti     10.10.10.30     5432   BLOQUEADO  PERMITIDO  NO   Ni TI entra directo a la base de datos
+srv    10.10.15.10     8007   PERMITIDO  PERMITIDO  SI   Servidores envían su respaldo a SRV-BK01 (R09)
+srv    10.10.15.10     22     BLOQUEADO  PERMITIDO  NO   Un servidor comprometido no puede entrar a BK01 por SSH
+bk     203.0.113.10    443    PERMITIDO  PERMITIDO  SI   SRV-BK01 sube la copia cifrada a la nube (R11)
+bk     10.10.10.20     445    BLOQUEADO  PERMITIDO  NO   El servidor de respaldos no inicia conexiones a servidores
+inet   10.10.10.30     443    BLOQUEADO  PERMITIDO  NO   Internet no entra directo a la red interna
+Resultado: 11 de 24 pruebas coinciden con lo esperado.

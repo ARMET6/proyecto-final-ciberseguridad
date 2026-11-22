@@ -1,0 +1,42 @@
+table inet campus {
+	counter bloqueado_lab_a_servidores {
+		packets 0 bytes 0
+	}
+
+	counter bloqueado_hacia_respaldos {
+		packets 0 bytes 0
+	}
+
+	counter bloqueado_otros {
+		packets 0 bytes 0
+	}
+
+	chain forward {
+		type filter hook forward priority filter; policy drop;
+		ct state established,related accept
+		ct state invalid drop
+		ip saddr 10.10.20.0/24 ip daddr 10.10.10.10 tcp dport { 53, 88, 389, 445, 464, 636 } accept comment "R01 ADM->DC01 AD"
+		ip saddr 10.10.20.0/24 ip daddr 10.10.10.20 tcp dport 445 accept comment "R02 ADM->FS01 SMB"
+		ip saddr 10.10.20.0/24 ip daddr 10.10.10.30 tcp dport 443 accept comment "R03 ADM->APP01 HTTPS"
+		ip saddr 10.10.40.0/24 ip daddr 10.10.10.10 tcp dport { 53, 88, 389, 445, 464, 636 } accept comment "R04 LAB->DC01 AD"
+		ip saddr { 10.10.20.0/24, 10.10.40.0/24 } ip daddr 203.0.113.0/24 tcp dport { 80, 443 } accept comment "R05 USR->INET web"
+		ip saddr 10.10.99.0/24 ip daddr 10.10.10.0/24 tcp dport { 22, 443, 8006 } accept comment "R06 TI->SRV admin"
+		ip saddr 10.10.99.0/24 ip daddr 10.10.15.10 tcp dport { 22, 8007 } accept comment "R07 TI->BK01 admin"
+		ip saddr 10.10.99.0/24 icmp type echo-request accept comment "R08 TI ping"
+		ip saddr 10.10.10.0/24 ip daddr 10.10.15.10 tcp dport 8007 accept comment "R09 SRV->BK01 respaldo"
+		ip saddr 10.10.10.0/24 ip daddr 203.0.113.0/24 tcp dport 443 accept comment "R10 SRV->INET actualizaciones"
+		ip saddr 10.10.15.10 ip daddr 203.0.113.0/24 tcp dport 443 accept comment "R11 BK01->NUBE copia cifrada"
+		ip saddr 10.10.40.0/24 ip daddr 10.10.10.0/24 counter name "bloqueado_lab_a_servidores" log prefix "FW-DROP LAB->SRV " drop comment "B01"
+		ip daddr 10.10.15.0/24 counter name "bloqueado_hacia_respaldos" log prefix "FW-DROP ->RESPALDOS " drop comment "B02"
+		counter name "bloqueado_otros" log prefix "FW-DROP OTRO " drop comment "B03 todo lo demás"
+	}
+
+	chain input {
+		type filter hook input priority filter; policy drop;
+		iif "lo" accept
+		ct state established,related accept
+		ip saddr 10.10.99.0/24 tcp dport { 22, 443 } accept comment "Administración del firewall solo desde TI"
+		ip saddr 10.10.99.0/24 icmp type echo-request accept
+		log prefix "FW-DROP INPUT " drop
+	}
+}

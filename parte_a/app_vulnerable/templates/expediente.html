@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block contenido %}
+<h3>Expediente {{ a['matricula'] }}</h3>
+<table><tr><th>Nombre</th><td>{{ a['nombre'] }}</td></tr><tr><th>Carrera</th><td>{{ a['carrera'] }}</td></tr>
+<tr><th>CURP (ficticia)</th><td>{{ a['curp'] }}</td></tr><tr><th>Teléfono</th><td>{{ a['telefono'] }}</td></tr>
+<tr><th>Beca</th><td>{{ a['beca'] }}</td></tr></table>{% endblock %}

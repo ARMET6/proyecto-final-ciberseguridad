@@ -1,0 +1,83 @@
+#!/usr/sbin/nft -f
+# =============================================================================
+# Reglas de firewall del Campus Las Torres (laboratorio de la Parte B, opción A)
+# Representa las reglas que aplicaría OPNsense entre las VLANs del diseño del avance
+# (Tabla 7). Política: TODO lo que no se permite explícitamente se bloquea y se registra.
+#
+#   VLAN 10 Servidores  10.10.10.0/24   DC01 .10 · FS01 .20 · APP01 .30 · MON01 .40
+#   VLAN 15 Respaldos   10.10.15.0/24   SRV-BK01 .10
+#   VLAN 20 Administr.  10.10.20.0/24
+#   VLAN 40 Laborator.  10.10.40.0/24
+#   VLAN 99 Gestión TI  10.10.99.0/24
+#   "Internet"          203.0.113.0/24  (red de documentación, simulada)
+# =============================================================================
+flush ruleset
+
+define NET_SRV   = 10.10.10.0/24
+define NET_BK    = 10.10.15.0/24
+define NET_ADM   = 10.10.20.0/24
+define NET_LAB   = 10.10.40.0/24
+define NET_TI    = 10.10.99.0/24
+define NET_INET  = 203.0.113.0/24
+
+define DC01  = 10.10.10.10
+define FS01  = 10.10.10.20
+define APP01 = 10.10.10.30
+define MON01 = 10.10.10.40
+define BK01  = 10.10.15.10
+
+# Puertos de Active Directory (Samba AD): DNS, Kerberos, LDAP, SMB (SYSVOL/GPO), kpasswd, LDAPS
+define AD_PUERTOS = { 53, 88, 389, 445, 464, 636 }
+
+table inet campus {
+
+    counter bloqueado_lab_a_servidores {}
+    counter bloqueado_hacia_respaldos {}
+    counter bloqueado_otros {}
+
+    # ---------------------------------------------------------------- tráfico entre VLANs
+    chain forward {
+        type filter hook forward priority filter; policy drop;
+
+        ct state established,related accept                         # respuestas de conexiones permitidas
+        ct state invalid drop
+
+        # --- R01-R03  Administrativos (VLAN 20): directorio, archivos, aplicaciones
+        ip saddr $NET_ADM ip daddr $DC01  tcp dport $AD_PUERTOS accept comment "R01 ADM->DC01 AD"
+        ip saddr $NET_ADM ip daddr $FS01  tcp dport 445          accept comment "R02 ADM->FS01 SMB"
+        ip saddr $NET_ADM ip daddr $APP01 tcp dport 443          accept comment "R03 ADM->APP01 HTTPS"
+
+        # --- R04  Laboratorios (VLAN 40): solo inicio de sesión en el dominio
+        ip saddr $NET_LAB ip daddr $DC01  tcp dport $AD_PUERTOS accept comment "R04 LAB->DC01 AD"
+
+        # --- R05  Usuarios (20 y 40) a Internet solo web
+        ip saddr { $NET_ADM, $NET_LAB } ip daddr $NET_INET tcp dport { 80, 443 } accept comment "R05 USR->INET web"
+
+        # --- R06-R08  Gestión TI (VLAN 99): administración con SSH, consola Proxmox y Wazuh
+        ip saddr $NET_TI ip daddr $NET_SRV tcp dport { 22, 443, 8006 } accept comment "R06 TI->SRV admin"
+        ip saddr $NET_TI ip daddr $BK01    tcp dport { 22, 8007 }      accept comment "R07 TI->BK01 admin"
+        ip saddr $NET_TI icmp type echo-request                        accept comment "R08 TI ping"
+
+        # --- R09  Servidores -> servidor de respaldos (cliente de Proxmox Backup Server)
+        ip saddr $NET_SRV ip daddr $BK01 tcp dport 8007 accept comment "R09 SRV->BK01 respaldo"
+
+        # --- R10-R11  Salidas a Internet: actualizaciones y copia a la nube
+        ip saddr $NET_SRV ip daddr $NET_INET tcp dport 443 accept comment "R10 SRV->INET actualizaciones"
+        ip saddr $BK01    ip daddr $NET_INET tcp dport 443 accept comment "R11 BK01->NUBE copia cifrada"
+
+        # --- Bloqueos explícitos con contador y registro (evidencia para Wazuh / journalctl -k)
+        ip saddr $NET_LAB ip daddr $NET_SRV counter name bloqueado_lab_a_servidores log prefix "FW-DROP LAB->SRV " drop comment "B01"
+        ip daddr $NET_BK  counter name bloqueado_hacia_respaldos log prefix "FW-DROP ->RESPALDOS " drop comment "B02"
+        counter name bloqueado_otros log prefix "FW-DROP OTRO " drop comment "B03 todo lo demás"
+    }
+
+    # ---------------------------------------------------------------- tráfico hacia el propio firewall
+    chain input {
+        type filter hook input priority filter; policy drop;
+        iif lo accept
+        ct state established,related accept
+        ip saddr $NET_TI tcp dport { 22, 443 } accept comment "Administración del firewall solo desde TI"
+        ip saddr $NET_TI icmp type echo-request accept
+        log prefix "FW-DROP INPUT " drop
+    }
+}

@@ -1,0 +1,26 @@
+Bitácora: evidencias/seguridad_ejemplo.log  ·  24 eventos  ·  2026-11-22T17:38:34 → 2026-11-22T17:38:35
+
+Eventos por tipo:
+  ENTRADA_SOSPECHOSA       5
+  ACCESO_DENEGADO          5
+  LOGIN_FALLIDO            5
+  LOGIN_OK                 3
+  AVISO_PUBLICADO          1
+  EXPEDIENTE_CONSULTADO    1
+  CUENTA_BLOQUEADA         1
+  NO_AUTENTICADO           1
+  ENTRADA_INVALIDA         1
+  RECURSO_NO_ENCONTRADO    1
+
+Eventos por nivel: {'INFO': 6, 'WARNING': 12, 'ALERT': 6}
+
+Alertas generadas (9):
+  - R1 FUERZA BRUTA: 5 intentos fallidos contra la cuenta 'se_carlos' desde ['127.0.0.1']
+  - R1 La aplicación bloqueó temporalmente la cuenta (control activo).
+  - R2 (aislado) 'al_laura' tuvo 2 acceso(s) denegado(s): ['expediente AL00000002', 'calificaciones AL00000003']
+  - R2 ENUMERACIÓN IDOR: 'al_diego' intentó 3 recursos ajenos: ['calificaciones AL00000001', 'calificaciones AL00000003', 'calificaciones AL00000004']
+  - R3 INYECCIÓN: 'doc_maria' envió en 'q': '
+  - R3 INYECCIÓN: 'doc_maria' envió en 'q': zzz' OR 1=1--
+  - R3 INYECCIÓN: 'doc_maria' envió en 'q': zzz' UNION SELECT usuario, rol, password_hash FROM
+  - R3 INYECCIÓN: 'doc_maria' envió en 'q': <script>alert('XSS-reflejado')</script>
+  - R3 INYECCIÓN: 'doc_maria' envió en 'contenido': <img src=x onerror=alert('XSS-almacenado')>

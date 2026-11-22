@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block contenido %}
+<h3>Tablón de avisos</h3>
+<form method="post"><textarea name="contenido" rows="3" cols="60"></textarea><br><button>Publicar</button></form>
+{% for a in avisos %}
+{# SEGURO: sin |safe, el contenido se muestra como texto #}
+<div class="aviso"><strong>{{ a['autor'] }}</strong> · {{ a['fecha'] }}<br>{{ a['contenido'] }}</div>
+{% endfor %}{% endblock %}

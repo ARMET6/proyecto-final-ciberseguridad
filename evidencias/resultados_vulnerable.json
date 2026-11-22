@@ -1,0 +1,54 @@
+{
+  "url": "http://127.0.0.1:5000",
+  "version": "vulnerable",
+  "resultados": [
+    {
+      "vulnerabilidad": "SQL Injection",
+      "prueba": "Comilla simple en /buscar?q='",
+      "resultado": "VULNERABLE",
+      "detalle": "HTTP 200; mensaje de error SQL visible: sí"
+    },
+    {
+      "vulnerabilidad": "SQL Injection",
+      "prueba": "Condición siempre verdadera  zzz' OR 1=1--",
+      "resultado": "VULNERABLE",
+      "detalle": "HTTP 200; filas devueltas: 4 (la búsqueda 'zzz' no debería devolver ninguna)"
+    },
+    {
+      "vulnerabilidad": "SQL Injection",
+      "prueba": "UNION SELECT sobre la tabla usuarios",
+      "resultado": "VULNERABLE",
+      "detalle": "HTTP 200; usuarios y hashes de contraseña expuestos: sí"
+    },
+    {
+      "vulnerabilidad": "XSS",
+      "prueba": "XSS reflejado en /buscar",
+      "resultado": "VULNERABLE",
+      "detalle": "script sin escapar en la respuesta: sí; CSP: ausente"
+    },
+    {
+      "vulnerabilidad": "XSS",
+      "prueba": "XSS almacenado en /avisos",
+      "resultado": "VULNERABLE",
+      "detalle": "etiqueta <img onerror> guardada y servida como HTML"
+    },
+    {
+      "vulnerabilidad": "IDOR/BOLA",
+      "prueba": "Control positivo: al_laura abre SU expediente AL00000001",
+      "resultado": "PROTEGIDA",
+      "detalle": "HTTP 200 (debe ser 200 en ambas versiones)"
+    },
+    {
+      "vulnerabilidad": "IDOR/BOLA",
+      "prueba": "al_laura abre el expediente de otro alumno AL00000002",
+      "resultado": "VULNERABLE",
+      "detalle": "HTTP 200; datos de Diego (CURP, teléfono, beca) visibles: sí"
+    },
+    {
+      "vulnerabilidad": "IDOR/BOLA",
+      "prueba": "API: al_laura pide calificaciones de AL00000003 (menor de edad)",
+      "resultado": "VULNERABLE",
+      "detalle": "HTTP 200; cuerpo: {\"calificaciones\":[{\"calificacion\":90,\"materia\":\"Matem\\u00e1ticas I\"}],\"matricul"
+    }
+  ]
+}

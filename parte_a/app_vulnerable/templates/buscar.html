@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% block contenido %}
+<h3>Buscar alumnos</h3>
+<form><input name="q" value="{{ q }}" placeholder="nombre"><button>Buscar</button></form>
+{# VULNERABLE (XSS reflejado): el término se imprime sin escapar #}
+<p>Resultados para: {{ q|safe }}</p>
+{% if error %}<p class="err">{{ error }}</p>{% endif %}
+<p><small>Consulta ejecutada: <code>{{ sql }}</code></small></p>
+<table><tr><th>Matrícula</th><th>Nombre</th><th>Carrera</th></tr>
+{% for f in filas %}<tr><td>{{ f[0] }}</td><td>{{ f[1] }}</td><td>{{ f[2] }}</td></tr>{% endfor %}</table>
+{% endblock %}

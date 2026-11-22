@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block contenido %}
+<h3>Bienvenido, {{ u['nombre'] }}</h3><p>Rol: <strong>{{ u['rol'] }}</strong></p>
+{% if u['matricula'] %}<p><a href="/alumno/{{ u['matricula'] }}">Ver mi expediente</a> ·
+<a href="/api/alumnos/{{ u['matricula'] }}/calificaciones">Mis calificaciones (API)</a></p>{% endif %}
+{% endblock %}
