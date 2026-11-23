@@ -1,7 +1,7 @@
 ##### Escaneo desde VLAN40-Laboratorios (10.10.40.50) · antes
 ##### nmap -sT -Pn -n --max-retries 1 --host-timeout 30s -p 22,53,80,88,389,443,445,464,636,1514,1515,3389,5432,8006,8007 10.10.10.10,20,30,40 10.10.15.10
 Nmap scan report for 10.10.10.10
-Host is up (0.00065s latency).
+Host is up (0.0017s latency).
 
 PORT     STATE  SERVICE
 22/tcp   open   ssh
@@ -21,7 +21,7 @@ PORT     STATE  SERVICE
 8007/tcp closed ajp12
 
 Nmap scan report for 10.10.10.20
-Host is up (0.00080s latency).
+Host is up (0.0019s latency).
 
 PORT     STATE  SERVICE
 22/tcp   open   ssh
@@ -41,7 +41,7 @@ PORT     STATE  SERVICE
 8007/tcp closed ajp12
 
 Nmap scan report for 10.10.10.30
-Host is up (0.00080s latency).
+Host is up (0.0017s latency).
 
 PORT     STATE  SERVICE
 22/tcp   open   ssh
@@ -61,7 +61,7 @@ PORT     STATE  SERVICE
 8007/tcp closed ajp12
 
 Nmap scan report for 10.10.10.40
-Host is up (0.00052s latency).
+Host is up (0.0015s latency).
 
 PORT     STATE  SERVICE
 22/tcp   open   ssh
@@ -81,7 +81,7 @@ PORT     STATE  SERVICE
 8007/tcp closed ajp12
 
 Nmap scan report for 10.10.15.10
-Host is up (0.00082s latency).
+Host is up (0.0020s latency).
 
 PORT     STATE  SERVICE
 22/tcp   open   ssh
@@ -104,7 +104,7 @@ PORT     STATE  SERVICE
 ##### Escaneo desde VLAN20-Administrativos (10.10.20.50) · antes
 ##### nmap -sT -Pn -n --max-retries 1 --host-timeout 30s -p 22,53,80,88,389,443,445,464,636,1514,1515,3389,5432,8006,8007 10.10.10.10,20,30,40 10.10.15.10
 Nmap scan report for 10.10.10.10
-Host is up (0.00016s latency).
+Host is up (0.0011s latency).
 
 PORT     STATE  SERVICE
 22/tcp   open   ssh
@@ -124,7 +124,7 @@ PORT     STATE  SERVICE
 8007/tcp closed ajp12
 
 Nmap scan report for 10.10.10.20
-Host is up (0.00017s latency).
+Host is up (0.0011s latency).
 
 PORT     STATE  SERVICE
 22/tcp   open   ssh
@@ -144,7 +144,7 @@ PORT     STATE  SERVICE
 8007/tcp closed ajp12
 
 Nmap scan report for 10.10.10.30
-Host is up (0.00016s latency).
+Host is up (0.0011s latency).
 
 PORT     STATE  SERVICE
 22/tcp   open   ssh
@@ -164,7 +164,7 @@ PORT     STATE  SERVICE
 8007/tcp closed ajp12
 
 Nmap scan report for 10.10.10.40
-Host is up (0.00015s latency).
+Host is up (0.00095s latency).
 
 PORT     STATE  SERVICE
 22/tcp   open   ssh
@@ -184,7 +184,7 @@ PORT     STATE  SERVICE
 8007/tcp closed ajp12
 
 Nmap scan report for 10.10.15.10
-Host is up (0.00018s latency).
+Host is up (0.0011s latency).
 
 PORT     STATE  SERVICE
 22/tcp   open   ssh
@@ -207,7 +207,7 @@ PORT     STATE  SERVICE
 ##### Escaneo desde VLAN99-Gestion-TI (10.10.99.50) · antes
 ##### nmap -sT -Pn -n --max-retries 1 --host-timeout 30s -p 22,53,80,88,389,443,445,464,636,1514,1515,3389,5432,8006,8007 10.10.10.10,20,30,40 10.10.15.10
 Nmap scan report for 10.10.10.10
-Host is up (0.00040s latency).
+Host is up (0.00057s latency).
 
 PORT     STATE  SERVICE
 22/tcp   open   ssh
@@ -227,7 +227,7 @@ PORT     STATE  SERVICE
 8007/tcp closed ajp12
 
 Nmap scan report for 10.10.10.20
-Host is up (0.00033s latency).
+Host is up (0.00056s latency).
 
 PORT     STATE  SERVICE
 22/tcp   open   ssh
@@ -247,7 +247,7 @@ PORT     STATE  SERVICE
 8007/tcp closed ajp12
 
 Nmap scan report for 10.10.10.30
-Host is up (0.00029s latency).
+Host is up (0.00056s latency).
 
 PORT     STATE  SERVICE
 22/tcp   open   ssh
@@ -267,7 +267,7 @@ PORT     STATE  SERVICE
 8007/tcp closed ajp12
 
 Nmap scan report for 10.10.10.40
-Host is up (0.00028s latency).
+Host is up (0.00051s latency).
 
 PORT     STATE  SERVICE
 22/tcp   open   ssh
@@ -287,7 +287,7 @@ PORT     STATE  SERVICE
 8007/tcp closed ajp12
 
 Nmap scan report for 10.10.15.10
-Host is up (0.00045s latency).
+Host is up (0.00056s latency).
 
 PORT     STATE  SERVICE
 22/tcp   open   ssh
