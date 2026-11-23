@@ -41,7 +41,7 @@ def rafagas(eventos, umbral):
 
 def main():
     ev = cargar()
-    print(f"Bitácora: {RUTA}  ·  {len(ev)} eventos  ·  {ev[0]['fecha']} → {ev[-1]['fecha']}\n")
+    print(f"Bitácora: {RUTA}  ·  {len(ev)} eventos  ·  de {ev[0]['fecha']} a {ev[-1]['fecha']}\n")
     print("Eventos por tipo:")
     for tipo, n in Counter(e["evento"] for e in ev).most_common():
         print(f"  {tipo:24} {n}")
