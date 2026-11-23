@@ -31,6 +31,8 @@ SIN_PROXY = {"http": None, "https": None}
 
 def zap(api, ruta, **params):
     r = requests.get(f"{api}{ruta}", params=params, proxies=SIN_PROXY, timeout=120)
+    if not r.ok:
+        print(f"ZAP respondió {r.status_code} en {ruta}: {r.text[:200]}")
     r.raise_for_status()
     return r.json() if "/JSON/" in ruta else r.text
 
@@ -64,13 +66,29 @@ def main():
     cookie = f"session={s.cookies.get('session')}"
 
     zap(api, "/JSON/core/action/newSession/", name=a.etiqueta, overwrite="true")
+    # Si un intento anterior se quedó a medias, la regla ya existe: se borra antes (sin error si no está)
+    requests.get(f"{api}/JSON/replacer/action/removeRule/", params={"description": "cookie-lab"},
+                 proxies=SIN_PROXY, timeout=30)
     zap(api, "/JSON/replacer/action/addRule/", description="cookie-lab", enabled="true",
         matchType="REQ_HEADER", matchRegex="false", matchString="Cookie", replacement=cookie, initiators="")
-    # Política reforzada para inyección SQL: con la fuerza por defecto ZAP no prueba
-    # suficientes variantes dentro de un LIKE '%...%'. 40018 = SQLi genérica, 40024 = SQLite.
-    for regla in ("40018", "40024"):
-        zap(api, "/JSON/ascan/action/setScannerAttackStrength/", id=regla, attackStrength="INSANE")
-        zap(api, "/JSON/ascan/action/setScannerAlertThreshold/", id=regla, alertThreshold="LOW")
+    # Política: se activan todas las reglas con valores por defecto (deshace cambios manuales)
+    # y se refuerzan las de inyección SQL (CWE-89): con la fuerza por defecto ZAP no prueba
+    # suficientes variantes dentro de un LIKE '%...%'. Se buscan por CWE porque los ids y
+    # nombres cambian entre versiones de ZAP.
+    zap(api, "/JSON/ascan/action/enableAllScanners/")
+    reglas_sql = []
+    for s in zap(api, "/JSON/ascan/view/scanners/")["scanners"]:
+        fuerza, umbral = "DEFAULT", "DEFAULT"
+        if str(s.get("cweId")) == "89":
+            fuerza, umbral = "INSANE", "LOW"
+            reglas_sql.append(f"{s['id']} {s['name']}")
+        for ruta, campo, valor in (("setScannerAttackStrength", "attackStrength", fuerza),
+                                   ("setScannerAlertThreshold", "alertThreshold", umbral)):
+            try:
+                zap(api, f"/JSON/ascan/action/{ruta}/", id=s["id"], **{campo: valor})
+            except requests.HTTPError:
+                pass                                   # la regla no admite ese valor
+    print("Reglas de inyección SQL reforzadas:", ", ".join(reglas_sql) or "ninguna encontrada")
     for ex in (f"{obj}/logout.*", f"{obj}/login.*"):
         zap(api, "/JSON/spider/action/excludeFromScan/", regex=ex)
         zap(api, "/JSON/ascan/action/excludeFromScan/", regex=ex)

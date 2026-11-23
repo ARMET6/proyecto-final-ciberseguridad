@@ -2,13 +2,13 @@
 
 | Riesgo | Alerta | Instancias | URL de ejemplo |
 |---|---|---|---|
-| High | Cross Site Scripting (Persistent) | 1 | `GET http://127.0.0.1:5000/avisos` |
 | High | Cross Site Scripting (Reflected) | 2 | `POST http://127.0.0.1:5000/avisos` |
-| High | SQL Injection - SQLite | 2 | `POST http://127.0.0.1:5000/avisos` |
-| Medium | Absence of Anti-CSRF Tokens | 1 | `GET http://127.0.0.1:5000/avisos` |
-| Medium | Content Security Policy (CSP) Header Not Set | 13 | `GET http://127.0.0.1:5000/` |
-| Medium | Missing Anti-clickjacking Header | 7 | `GET http://127.0.0.1:5000/` |
-| Low | Server Leaks Version Information via "Server" HTTP Response Header Field | 15 | `GET http://127.0.0.1:5000/` |
-| Low | X-Content-Type-Options Header Missing | 8 | `GET http://127.0.0.1:5000/` |
-| Informational | User Agent Fuzzer | 24 | `POST http://127.0.0.1:5000/avisos` |
-| Informational | User Controllable HTML Element Attribute (Potential XSS) | 2 | `GET http://127.0.0.1:5000/buscar?q=Laura` |
+| High | Cross Site Scripting XSS (Persistente) | 1 | `GET http://127.0.0.1:5000/avisos` |
+| Medium | Ausencia de Tokens Anti-CSRF | 1 | `GET http://127.0.0.1:5000/avisos` |
+| Medium | Cabecera Content Security Policy (CSP) no configurada | 13 | `GET http://127.0.0.1:5000/buscar?q=Laura` |
+| Medium | Falta de cabecera Anti-Clickjacking | 6 | `GET http://127.0.0.1:5000/buscar?q=Laura` |
+| Low | El servidor filtra información de versión a través del campo "Server" del encabezado de respuesta HTTP | 15 | `GET http://127.0.0.1:5000/` |
+| Low | Falta encabezado X-Content-Type-Options | 7 | `GET http://127.0.0.1:5000/` |
+| Informational | Atributo de elemento HTML controlable por el usuario (XSS potencial) | 2 | `GET http://127.0.0.1:5000/buscar?q=Laura` |
+| Informational | Divulgación de información - Comentarios sospechosos | 1 | `GET http://127.0.0.1:5000/avisos` |
+| Informational | User Agent Fuzzer | 24 | `GET http://127.0.0.1:5000/avisos` |
