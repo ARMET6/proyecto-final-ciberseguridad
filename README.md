@@ -16,7 +16,7 @@ Continuación del avance (arquitectura híbrida con Linux, escenario de ransomwa
 | `docs/` | Guía de ZAP, procedimiento de respuesta a incidentes, guía de capturas | 1, 9 |
 | `evidencias/` | Salidas reales de la última ejecución (ZAP, pruebas, bitácoras, Nmap, firewall) | 4, 5, 8 |
 
-> ⚠️ Solo para laboratorio. Las apps escuchan únicamente en `127.0.0.1`. No hay credenciales en el
+> Solo para laboratorio. Las apps escuchan únicamente en `127.0.0.1`. No hay credenciales en el
 > repositorio: `init_db.py` genera contraseñas aleatorias en `parte_a/instance/credenciales_lab.json`,
 > que está en `.gitignore`.
 
