@@ -11,14 +11,24 @@ table inet campus {
 		packets 0 bytes 0
 	}
 
+	counter smb_hacia_fs01 {
+		packets 0 bytes 0
+	}
+
+	counter smb_no_autorizado {
+		packets 0 bytes 0
+	}
+
 	chain forward {
 		type filter hook forward priority filter; policy drop;
 		ct state established,related accept
 		ct state invalid drop
 		ip saddr 10.10.20.0/24 ip daddr 10.10.10.10 tcp dport { 53, 88, 389, 445, 464, 636 } accept comment "R01 ADM->DC01 AD"
-		ip saddr 10.10.20.0/24 ip daddr 10.10.10.20 tcp dport 445 accept comment "R02 ADM->FS01 SMB"
+		ip saddr 10.10.20.0/24 ip daddr 10.10.10.10 udp dport { 53, 88, 464 } accept comment "R01u ADM->DC01 AD por UDP"
+		ip saddr 10.10.20.50 ip daddr 10.10.10.20 tcp dport 445 counter name "smb_hacia_fs01" accept comment "R02 solo equipos autorizados->FS01 SMB"
 		ip saddr 10.10.20.0/24 ip daddr 10.10.10.30 tcp dport 443 accept comment "R03 ADM->APP01 HTTPS"
 		ip saddr 10.10.40.0/24 ip daddr 10.10.10.10 tcp dport { 53, 88, 389, 445, 464, 636 } accept comment "R04 LAB->DC01 AD"
+		ip saddr 10.10.40.0/24 ip daddr 10.10.10.10 udp dport { 53, 88, 464 } accept comment "R04u LAB->DC01 AD por UDP"
 		ip saddr { 10.10.20.0/24, 10.10.40.0/24 } ip daddr 203.0.113.0/24 tcp dport { 80, 443 } accept comment "R05 USR->INET web"
 		ip saddr 10.10.99.0/24 ip daddr 10.10.10.0/24 tcp dport { 22, 443, 8006 } accept comment "R06 TI->SRV admin"
 		ip saddr 10.10.99.0/24 ip daddr 10.10.15.10 tcp dport { 22, 8007 } accept comment "R07 TI->BK01 admin"
@@ -28,6 +38,7 @@ table inet campus {
 		ip saddr 10.10.15.10 ip daddr 203.0.113.0/24 tcp dport 443 accept comment "R11 BK01->NUBE copia cifrada"
 		ip saddr 10.10.40.0/24 ip daddr 10.10.10.0/24 counter name "bloqueado_lab_a_servidores" log prefix "FW-DROP LAB->SRV " drop comment "B01"
 		ip daddr 10.10.15.0/24 counter name "bloqueado_hacia_respaldos" log prefix "FW-DROP ->RESPALDOS " drop comment "B02"
+		ip daddr 10.10.10.20 tcp dport 445 counter name "smb_no_autorizado" log prefix "FW-DROP SMB " drop comment "B04 SMB desde equipos no autorizados"
 		counter name "bloqueado_otros" log prefix "FW-DROP OTRO " drop comment "B03 todo lo demás"
 	}
 

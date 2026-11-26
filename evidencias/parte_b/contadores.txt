@@ -1,7 +1,11 @@
 Contadores de bloqueos del firewall:
 	counter bloqueado_lab_a_servidores {
-		packets 114 bytes 6840
+		packets 142 bytes 8807
 	counter bloqueado_hacia_respaldos {
 		packets 96 bytes 5760
 	counter bloqueado_otros {
-		packets 224 bytes 13440
+		packets 220 bytes 13200
+	counter smb_hacia_fs01 {
+		packets 2 bytes 120
+	counter smb_no_autorizado {
+		packets 7 bytes 420
