@@ -55,10 +55,11 @@ Cuentas de prueba (contraseñas en `parte_a/instance/credenciales_lab.json`):
 |---|---|---|
 | `al_laura` | alumno (AL00000001) | ver solo su expediente y calificaciones |
 | `al_diego` | alumno (AL00000002) | ver solo su expediente y calificaciones |
-| `doc_maria` | docente | buscar alumnos y consultar calificaciones |
+| `doc_maria` | docente | consultar solo a sus alumnos asignados |
 | `se_carlos` | servicios escolares | buscar alumnos y consultar expedientes |
+| `admin_ti` | administración de TI | consultar cuentas y roles, sin ver expedientes |
 
-Endpoints: `/login`, `/buscar?q=`, `/avisos`, `/alumno/<matricula>`, `/api/alumnos/<matricula>/calificaciones`, `/salud`.
+Endpoints: `/login`, `/logout` (POST), `/buscar?q=`, `/admin/usuarios`, `/avisos`, `/alumno/<matricula>`, `/api/alumnos/<matricula>/calificaciones`, `/salud`.
 
 ### OWASP ZAP
 
@@ -73,7 +74,7 @@ python parte_a/zap/escaneo_zap.py --objetivo http://127.0.0.1:5001 --etiqueta co
 ## Parte B · Firewall y Nmap (opción A)
 
 ```bash
-sudo bash parte_b/laboratorio_red.sh todo        # crea la red, escanea sin y con firewall, prueba 24 flujos
+sudo bash parte_b/laboratorio_red.sh todo        # crea la red, escanea sin y con firewall, prueba 30 flujos (TCP y UDP)
 sudo bash parte_b/laboratorio_red.sh destruir    # elimina la red virtual
 ```
 
@@ -84,7 +85,17 @@ aplica [`parte_b/reglas_campus.nft`](parte_b/reglas_campus.nft). No modifica la 
 
 | Prueba | Versión vulnerable | Versión corregida |
 |---|---|---|
-| Pruebas manuales (`pruebas_seguridad.py`) | 7 de 7 ataques exitosos | 0 de 7 ataques exitosos |
-| Alertas **High** de OWASP ZAP | 5 (XSS persistente, XSS reflejado ×2, SQLi-SQLite ×2) | 0 |
-| Pruebas unitarias | — | 7/7 aprobadas |
-| Flujos de red como se esperaba (Parte B) | 11/24 sin firewall | 24/24 con firewall |
+| Pruebas manuales (`pruebas_seguridad.py`): SQLi, XSS, IDOR, permisos por rol, CSRF, CSP y cabecera Server | 12 de 12 ataques exitosos | 0 de 12 ataques exitosos (3 de 3 accesos legítimos funcionan) |
+| Alertas **High** de OWASP ZAP | XSS persistente y reflejado (+ SQLi con la regla de SQLite, si la versión de ZAP la incluye) | 0 |
+| Alertas Medium/Low de OWASP ZAP | CSRF, CSP, clickjacking, X-Content-Type-Options, versión del servidor | 0 (solo informativas) |
+| Pruebas unitarias | — | 14/14 aprobadas |
+| Flujos de red como se esperaba (Parte B, TCP y UDP) | 15/30 sin firewall | 30/30 con firewall |
+
+## Permisos por rol (versión corregida)
+
+| Rol | Cuenta de prueba | Puede | No puede |
+|---|---|---|---|
+| Alumno | `al_laura`, `al_diego` | Ver su expediente y sus calificaciones | Ver datos de otros alumnos ni usar el directorio |
+| Docente | `doc_maria` | Consultar a los alumnos de sus grupos (AL00000001 y AL00000003) | Consultar alumnos que no tiene asignados |
+| Servicios Escolares | `se_carlos` | Consultar y gestionar todos los expedientes | Administrar cuentas |
+| Administración de TI | `admin_ti` | Consultar las cuentas y sus roles (`/admin/usuarios`); cada consulta queda en la bitácora | Ver expedientes o calificaciones |

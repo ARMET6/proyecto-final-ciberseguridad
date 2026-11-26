@@ -73,3 +73,19 @@ VM-FS01:445, mientras TI conserva su acceso SSH para investigar.
 | Monitoreo reforzado 30 días sobre las cuentas y equipos afectados | 📋 |
 | Notificar a titulares afectados si la vulneración afecta significativamente sus derechos (LFPDPPP) | 📋 |
 | Reunión de lecciones aprendidas y actualización de este procedimiento | 📋 |
+
+## Responsables, tiempos y criterios de cierre
+
+Objetivos tomados del avance del proyecto: **RTO** de 8 horas para servicios críticos y 48 horas para el resto;
+**RPO** de 1 hora para borrados accidentales y 24 horas ante una falla de servidor.
+
+| Etapa | Responsable | Acción principal | Tiempo objetivo | Criterio para pasar a la siguiente etapa |
+|---|---|---|---|---|
+| Detección | Monitoreo / TI (Wazuh, bitácoras) | Confirmar la alerta y abrir el registro del incidente | 15 min desde la alerta | Incidente registrado con hora, equipo y cuenta |
+| Análisis | Coordinador de TI | Identificar equipos, cuentas, VLAN y datos afectados | 1 h | Alcance documentado; respaldos revisados y sin compromiso |
+| Contención | Administradores de red | Aislar la VLAN o el equipo (`aislar <segmento>`), deshabilitar la cuenta | 30 min tras el análisis | Contadores del firewall sin tráfico nuevo del origen |
+| Recuperación | Administradores de sistemas | Restaurar desde SRV-BK01 o la nube, en orden de prioridad | Dentro del RTO (8 h críticos) | Huellas SHA-256 iguales; servicios en línea |
+| Verificación | TI y responsables de cada sistema | Repetir pruebas de seguridad y conectividad | 2 h tras la restauración | 0 alertas High en ZAP, 30/30 flujos de red, usuarios validan |
+
+Todas las decisiones, responsables y horas se anotan en el registro del incidente para la reunión de lecciones aprendidas.
+Los tiempos objetivo de cada etapa son una propuesta del equipo; el RTO y el RPO vienen del avance.

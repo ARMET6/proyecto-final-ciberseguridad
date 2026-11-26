@@ -15,6 +15,8 @@ Solo debe usarse contra la aplicación de laboratorio en 127.0.0.1.
 import argparse
 import html
 import json
+import re
+import secrets
 import sys
 from pathlib import Path
 from urllib.parse import urlparse
@@ -23,19 +25,30 @@ import requests
 
 CRED = Path(__file__).resolve().parent.parent / "instance" / "credenciales_lab.json"
 resultados = []
+TOKEN_RE = re.compile(r'name="csrf_token" value="([^"]+)"')
 
 
-def registrar(vuln, prueba, vulnerable, detalle):
-    estado = "VULNERABLE" if vulnerable else "PROTEGIDA"
-    resultados.append({"vulnerabilidad": vuln, "prueba": prueba, "resultado": estado, "detalle": detalle})
+def registrar(vuln, prueba, vulnerable, detalle, control=False):
+    """control=True: acceso legítimo que debe seguir funcionando (no cuenta como ataque)."""
+    estado = ("OK" if not vulnerable else "FALLA") if control else ("VULNERABLE" if vulnerable else "PROTEGIDA")
+    resultados.append({"vulnerabilidad": vuln, "prueba": prueba, "resultado": estado,
+                       "detalle": detalle, "control": control})
     print(f"[{estado:10}] {vuln} · {prueba}\n             {detalle}")
+
+
+def token(s, url, ruta):
+    """Token CSRF del formulario de la página (la versión vulnerable no tiene: devuelve '')."""
+    m = TOKEN_RE.search(s.get(f"{url}{ruta}").text)
+    return m.group(1) if m else ""
 
 
 def sesion(url, usuario, creds):
     s = requests.Session()
-    r = s.post(f"{url}/login", data={"usuario": usuario, "password": creds[usuario]}, allow_redirects=False)
+    r = s.post(f"{url}/login", data={"usuario": usuario, "password": creds[usuario],
+                                     "csrf_token": token(s, url, "/login")}, allow_redirects=False)
     if r.status_code != 302:
-        sys.exit(f"No se pudo iniciar sesión como {usuario} (HTTP {r.status_code})")
+        sys.exit(f"No se pudo iniciar sesión como {usuario} (HTTP {r.status_code}). "
+                 "Si se_carlos quedó bloqueada por una corrida anterior, espere 5 minutos o reinicie la app.")
     return s
 
 
@@ -67,7 +80,7 @@ def prueba_xss(url, s):
     registrar(v, "XSS reflejado en /buscar", crudo,
               f"script sin escapar en la respuesta: {'sí' if crudo else 'no'}; CSP: {csp[:40]}")
     p_alm = "<img src=x onerror=alert('XSS-almacenado')>"
-    s.post(f"{url}/avisos", data={"contenido": p_alm})
+    s.post(f"{url}/avisos", data={"contenido": p_alm, "csrf_token": token(s, url, "/avisos")})
     r = s.get(f"{url}/avisos")
     crudo = p_alm in r.text
     registrar(v, "XSS almacenado en /avisos", crudo,
@@ -78,8 +91,8 @@ def prueba_xss(url, s):
 def prueba_idor(url, s_alumno):
     v = "IDOR/BOLA"
     r = s_alumno.get(f"{url}/alumno/AL00000001")
-    registrar(v, "Control positivo: al_laura abre SU expediente AL00000001", False,
-              f"HTTP {r.status_code} (debe ser 200 en ambas versiones)")
+    registrar(v, "Control positivo: al_laura abre SU expediente AL00000001", r.status_code != 200,
+              f"HTTP {r.status_code} (debe ser 200 en ambas versiones)", control=True)
     r = s_alumno.get(f"{url}/alumno/AL00000002")
     expuesto = r.status_code == 200 and "Diego" in r.text
     registrar(v, "al_laura abre el expediente de otro alumno AL00000002", expuesto,
@@ -90,11 +103,56 @@ def prueba_idor(url, s_alumno):
               f"HTTP {r.status_code}; cuerpo: {r.text.strip()[:80]}")
 
 
+def prueba_roles(url, creds):
+    """Permisos por rol y responsabilidad (mejora de la revisión final)."""
+    v = "Permisos por rol"
+    s = sesion(url, "doc_maria", creds)               # docente con grupos AL00000001 y AL00000003
+    r = s.get(f"{url}/api/alumnos/AL00000003/calificaciones")
+    registrar(v, "Control positivo: doc_maria consulta a su alumna asignada AL00000003",
+              r.status_code != 200, f"HTTP {r.status_code} (debe ser 200)", control=True)
+    r = s.get(f"{url}/alumno/AL00000002")
+    expuesto = r.status_code == 200 and "Diego" in r.text
+    registrar(v, "doc_maria abre el expediente de AL00000002, que no es de sus grupos", expuesto,
+              f"HTTP {r.status_code}; expediente visible: {'sí' if expuesto else 'no'}")
+    s = sesion(url, "se_carlos", creds)
+    r = s.get(f"{url}/alumno/AL00000002")
+    registrar(v, "Control positivo: servicios escolares (se_carlos) gestiona el expediente AL00000002",
+              r.status_code != 200, f"HTTP {r.status_code} (debe ser 200)", control=True)
+    s = sesion(url, "admin_ti", creds)
+    r = s.get(f"{url}/alumno/AL00000001")
+    expuesto = r.status_code == 200 and "CURP" in r.text
+    registrar(v, "admin_ti (administración de TI) abre un expediente académico", expuesto,
+              f"HTTP {r.status_code}; expediente visible: {'sí' if expuesto else 'no'}")
+
+
+def prueba_csrf(url, s):
+    """Una página externa intenta publicar un aviso con la sesión de la víctima (sin token)."""
+    marca = f"aviso-falso-por-CSRF-{secrets.token_hex(4)}"     # único en cada corrida
+    r = s.post(f"{url}/avisos", data={"contenido": marca}, allow_redirects=False)
+    aceptado = marca in s.get(f"{url}/avisos").text
+    registrar("CSRF", "POST a /avisos sin token CSRF, usando la sesión de doc_maria", aceptado,
+              f"HTTP {r.status_code}; aviso publicado: {'sí' if aceptado else 'no (rechazado)'}")
+
+
+def prueba_cabeceras(url):
+    v = "Configuración"
+    r = requests.get(f"{url}/login")
+    csp = r.headers.get("Content-Security-Policy", "")
+    debil = not csp or "unsafe-inline" in csp
+    registrar(v, "Content-Security-Policy sin 'unsafe-inline'", debil,
+              f"CSP: {csp[:70] + '...' if csp else 'ausente'}")
+    server = r.headers.get("Server", "")
+    revela = bool(re.search(r"\d+\.\d+", server))
+    registrar(v, "Cabecera Server sin versiones", revela, f"Server: {server or 'ausente'}")
+
+
 def eventos_controlados(url, creds):
     """Actividad 5: genera eventos para revisar en la bitácora."""
     print("\nGenerando eventos controlados para la bitácora...")
+    atacante = requests.Session()
     for i in range(6):                                            # fuerza bruta -> bloqueo
-        requests.post(f"{url}/login", data={"usuario": "se_carlos", "password": f"incorrecta{i}"})
+        atacante.post(f"{url}/login", data={"usuario": "se_carlos", "password": f"incorrecta{i}",
+                                            "csrf_token": token(atacante, url, "/login")})
     requests.get(f"{url}/api/alumnos/AL00000001/calificaciones")    # sin sesión -> 401
     s = sesion(url, "al_diego", creds)
     for n in range(1, 5):                                         # enumeración de matrículas
@@ -119,9 +177,16 @@ def main():
     prueba_sqli(url, s_doc)
     prueba_xss(url, s_doc)
     prueba_idor(url, sesion(url, "al_laura", creds))
+    prueba_roles(url, creds)
+    prueba_csrf(url, s_doc)
+    prueba_cabeceras(url)
     eventos_controlados(url, creds)
-    vuln = sum(r["resultado"] == "VULNERABLE" for r in resultados)
-    print(f"\nResumen: {vuln} pruebas vulnerables de {len(resultados)} (incluye 1 control positivo).")
+    ataques = [r for r in resultados if not r["control"]]
+    controles = [r for r in resultados if r["control"]]
+    vuln = sum(r["resultado"] == "VULNERABLE" for r in ataques)
+    ok = sum(r["resultado"] == "OK" for r in controles)
+    print(f"\nResumen: {vuln} de {len(ataques)} ataques tuvieron éxito; "
+          f"{ok} de {len(controles)} accesos legítimos funcionan.")
     if a.salida:
         Path(a.salida).write_text(json.dumps({"url": url, "version": version, "resultados": resultados},
                                              indent=2, ensure_ascii=False), encoding="utf-8")

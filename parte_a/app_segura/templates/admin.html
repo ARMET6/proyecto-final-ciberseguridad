@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% block contenido %}
+<h3>Cuentas del sistema</h3>
+<p>El rol de administración gestiona cuentas y roles; no tiene acceso a expedientes ni calificaciones. Esta consulta queda registrada en la bitácora.</p>
+<table><tr><th>Usuario</th><th>Rol</th><th>Nombre</th></tr>
+{% for c in cuentas %}<tr><td>{{ c['usuario'] }}</td><td>{{ c['rol'] }}</td><td>{{ c['nombre'] }}</td></tr>{% endfor %}</table>
+{% endblock %}

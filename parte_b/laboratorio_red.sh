@@ -44,11 +44,15 @@ crear() {
     ns "$s" ip link set eth0 up
     ns "$s" ip route add default via "${RED[$s]}.1"
   done
+  # Segundo equipo de la VLAN 20: recepción, que no necesita las carpetas de VM-FS01
+  ns adm ip addr add 10.10.20.60/24 dev eth0
   # Servidores de la VLAN 10 (cuatro VMs del host SRV-HV01)
   for h in 20 30 40; do ns srv ip addr add "10.10.10.$h/24" dev eth0; done
   ns srv python3 "$DIR/servicios_simulados.py" VM-DC01 10.10.10.10:22 10.10.10.10:53 10.10.10.10:88 \
-     10.10.10.10:389 10.10.10.10:445 10.10.10.10:464 10.10.10.10:636 >/dev/null 2>&1 &
-  ns srv python3 "$DIR/servicios_simulados.py" VM-FS01 10.10.10.20:22 10.10.10.20:445 >/dev/null 2>&1 &
+     10.10.10.10:389 10.10.10.10:445 10.10.10.10:464 10.10.10.10:636 \
+     10.10.10.10:udp/53 10.10.10.10:udp/88 10.10.10.10:udp/464 >/dev/null 2>&1 &
+  ns srv python3 "$DIR/servicios_simulados.py" VM-FS01 10.10.10.20:22 10.10.10.20:445 \
+     10.10.10.20:udp/137 >/dev/null 2>&1 &
   ns srv python3 "$DIR/servicios_simulados.py" VM-APP01 10.10.10.30:22 10.10.10.30:443 10.10.10.30:5432 >/dev/null 2>&1 &
   ns srv python3 "$DIR/servicios_simulados.py" VM-MON01 10.10.10.40:22 10.10.10.40:443 10.10.10.40:1514 \
      10.10.10.40:1515 >/dev/null 2>&1 &
@@ -57,6 +61,7 @@ crear() {
   sleep 1
   echo "Red creada:"
   for s in "${SEGMENTOS[@]}"; do printf "  %-24s %s.0/24\n" "${NOMBRE[$s]}" "${RED[$s]}"; done
+  echo "  (VLAN 20 con dos equipos: 10.10.20.50 Servicios Escolares y 10.10.20.60 recepción)"
 }
 
 sin_firewall() { ns fw nft flush ruleset; echo "Firewall SIN reglas: el campus es una red plana."; }
@@ -79,17 +84,26 @@ escanear() {
       echo
     } >> "$f"
   done
+  # UDP: DNS, Kerberos y kpasswd de VM-DC01 y NetBIOS de VM-FS01, desde laboratorios
+  {
+    echo "##### Escaneo UDP desde ${NOMBRE[lab]} · $etiqueta"
+    echo "##### nmap -sU -Pn -n --max-retries 1 -p 53,88,137,464 10.10.10.10,20"
+    ns lab nmap -sU -Pn -n --max-retries 1 -p 53,88,137,464 10.10.10.10,20 | grep -vE "^(Starting|Nmap done)"
+    echo
+  } >> "$f"
   echo "Resumen de puertos ABIERTOS por origen ($etiqueta):"
   python3 - "$f" <<'PY'
 import re, sys
 bloque = None
 for l in open(sys.argv[1]):
     if l.startswith("##### Escaneo"):
-        bloque = l.split("desde ")[1].split(" (")[0]; print(f"  {bloque}:"); host = None
+        bloque = l.split("desde ")[1].split(" (")[0].split(" ·")[0].strip()
+        if "UDP" in l: bloque += " (UDP)"
+        print(f"  {bloque}:"); host = None
     m = re.match(r"Nmap scan report for (\S+)", l)
     if m: host = m.group(1)
-    m = re.match(r"(\d+)/tcp\s+open", l)
-    if m: print(f"      {host}:{m.group(1)}")
+    m = re.match(r"(\d+)/(tcp|udp)\s+open\s", l)
+    if m: print(f"      {host}:{m.group(1)}" + ("/udp" if m.group(2) == "udp" else ""))
 PY
   echo "Salida completa: $f"
 }
@@ -103,7 +117,13 @@ PRUEBAS=(
   "adm|10.10.10.20|22|BLOQUEADO|SSH solo desde Gestión TI"
   "adm|10.10.15.10|8007|BLOQUEADO|Usuarios no alcanzan el servidor de respaldos (B02)"
   "adm|203.0.113.10|443|PERMITIDO|Navegación web (R05)"
+  "adm|10.10.10.10|udp/53|PERMITIDO|DNS por UDP hacia el controlador de dominio (R01u)"
+  "adm@10.10.20.60|10.10.10.10|389|PERMITIDO|Recepción sí inicia sesión en el dominio (R01)"
+  "adm@10.10.20.60|10.10.10.20|445|BLOQUEADO|Recepción no necesita carpetas: sin SMB (B04)"
   "lab|10.10.10.10|88|PERMITIDO|Equipo de laboratorio inicia sesión con Kerberos (R04)"
+  "lab|10.10.10.10|udp/53|PERMITIDO|DNS por UDP (R04u)"
+  "lab|10.10.10.10|udp/88|PERMITIDO|Kerberos por UDP (R04u)"
+  "lab|10.10.10.20|udp/137|BLOQUEADO|Sin NetBIOS/UDP hacia el servidor de archivos (B01)"
   "lab|10.10.10.20|445|BLOQUEADO|Ransomware en laboratorio NO llega a expedientes (B01)"
   "lab|10.10.10.30|443|BLOQUEADO|Laboratorio no usa aplicaciones administrativas"
   "lab|10.10.10.40|1514|BLOQUEADO|Laboratorio no habla con el monitoreo"
@@ -124,12 +144,16 @@ PRUEBAS=(
 
 probar() {
   local f="$OUT/pruebas_conectividad.txt" ok=0 total=0
-  printf "%-6s %-15s %-6s %-10s %-10s %-4s %s\n" ORIGEN DESTINO PUERTO ESPERADO OBTENIDO OK JUSTIFICACION | tee "$f"
+  printf "%-18s %-13s %-8s %-10s %-10s %-3s %s\n" ORIGEN DESTINO PUERTO ESPERADO OBTENIDO OK JUSTIFICACION | tee "$f"
   for p in "${PRUEBAS[@]}"; do
     IFS='|' read -r o d port esp just <<< "$p"
-    if ns "$o" timeout 2 bash -c "exec 3<>/dev/tcp/$d/$port" 2>/dev/null; then got=PERMITIDO; else got=BLOQUEADO; fi
+    local nso="${o%%@*}" origen="" proto=tcp num="$port"
+    [[ "$o" == *@* ]] && origen="--origen ${o#*@}"
+    [[ "$port" == udp/* ]] && { proto=udp; num="${port#udp/}"; }
+    if ns "$nso" python3 "$DIR/sonda.py" $proto "$d" "$num" $origen; then got=PERMITIDO; else got=BLOQUEADO; fi
     total=$((total+1)); [[ "$got" == "$esp" ]] && { ok=$((ok+1)); r=SI; } || r=NO
-    printf "%-6s %-15s %-6s %-10s %-10s %-4s %s\n" "$o" "$d" "$port" "$esp" "$got" "$r" "$just" | tee -a "$f"
+    local etiqueta="$nso"; [[ "$o" == *@* ]] && etiqueta="$nso(${o#*@})"
+    printf "%-18s %-13s %-8s %-10s %-10s %-3s %s\n" "$etiqueta" "$d" "$port" "$esp" "$got" "$r" "$just" | tee -a "$f"
   done
   echo "Resultado: $ok de $total pruebas coinciden con lo esperado." | tee -a "$f"
 }

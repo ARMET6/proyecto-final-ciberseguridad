@@ -9,6 +9,8 @@ parecidas a las que se configurarían en Wazuh (VM-MON01) en el diseño del camp
   R3  Intento de inyección: cualquier ENTRADA_SOSPECHOSA (SQLi / XSS).
   R4  Sondeo: >= 3 eventos ENTRADA_INVALIDA / RECURSO_NO_ENCONTRADO de la misma IP.
   R5  Escaneo automatizado: > 20 ENTRADA_SOSPECHOSA en 5 minutos (por ejemplo, OWASP ZAP).
+  R6  CSRF: cualquier CSRF_RECHAZADO (formulario enviado sin token válido).
+  R7  Uso de privilegios: toda ADMIN_CONSULTA se reporta para auditoría.
 
 Uso:
     python parte_a/pruebas/analisis_logs.py [ruta_log]
@@ -77,6 +79,12 @@ def main():
         sospechosas = sospechosas[:5]
     for e in sospechosas:
         alertas.append(f"R3 INYECCIÓN: '{e['usuario']}' envió en '{e['campo']}': {e['valor']}")
+
+    for e in ev:
+        if e["evento"] == "CSRF_RECHAZADO":
+            alertas.append(f"R6 CSRF: solicitud sin token válido en {e['ruta']} (sesión de '{e['usuario']}')")
+        if e["evento"] == "ADMIN_CONSULTA":
+            alertas.append(f"R7 AUDITORÍA: '{e['usuario']}' consultó {e.get('recurso', '?')} a las {e['fecha'][11:]}")
 
     por_ip = Counter(e["ip"] for e in ev if e["evento"] in ("ENTRADA_INVALIDA", "RECURSO_NO_ENCONTRADO"))
     for ip, n in por_ip.items():

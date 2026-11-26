@@ -26,6 +26,13 @@ CUENTAS = [
     ("al_diego", "alumno", "AL00000002", "Diego Ramírez (ficticio)"),
     ("doc_maria", "docente", None, "María Torres (ficticia)"),
     ("se_carlos", "escolares", None, "Carlos Peña (ficticio)"),
+    ("admin_ti", "admin", None, "Administración de TI (ficticia)"),
+]
+
+# Grupos asignados a cada docente: solo puede consultar a estos alumnos
+ASIGNACIONES = [
+    ("doc_maria", "AL00000001"),
+    ("doc_maria", "AL00000003"),
 ]
 
 ALUMNOS = [
@@ -55,7 +62,7 @@ def crear():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             usuario TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
-            rol TEXT NOT NULL CHECK (rol IN ('alumno','docente','escolares')),
+            rol TEXT NOT NULL CHECK (rol IN ('alumno','docente','escolares','admin')),
             matricula TEXT,
             nombre TEXT NOT NULL
         );
@@ -72,6 +79,11 @@ def crear():
             matricula TEXT NOT NULL REFERENCES alumnos(matricula),
             materia TEXT NOT NULL,
             calificacion INTEGER NOT NULL
+        );
+        CREATE TABLE asignaciones (
+            docente TEXT NOT NULL REFERENCES usuarios(usuario),
+            matricula TEXT NOT NULL REFERENCES alumnos(matricula),
+            PRIMARY KEY (docente, matricula)
         );
         CREATE TABLE avisos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -90,6 +102,7 @@ def crear():
             (usuario, generate_password_hash(pwd), rol, matricula, nombre),
         )
     cur.executemany("INSERT INTO alumnos VALUES (?,?,?,?,?,?)", ALUMNOS)
+    cur.executemany("INSERT INTO asignaciones VALUES (?,?)", ASIGNACIONES)
     cur.executemany("INSERT INTO calificaciones (matricula, materia, calificacion) VALUES (?,?,?)", CALIFICACIONES)
     cur.execute("INSERT INTO avisos (autor, contenido) VALUES (?, ?)",
                 ("se_carlos", "Recuerden que las reinscripciones cierran el viernes."))

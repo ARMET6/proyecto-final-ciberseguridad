@@ -17,6 +17,7 @@ y guarda las alertas en evidencias/zap_<etiqueta>.json y un reporte HTML.
 """
 import argparse
 import json
+import re
 import sys
 import time
 from collections import Counter
@@ -62,7 +63,11 @@ def main():
     # 1) Sesión autenticada (doc_maria tiene acceso a todas las funciones)
     creds = json.loads(CRED.read_text(encoding="utf-8"))
     s = requests.Session()
-    s.post(f"{obj}/login", data={"usuario": "doc_maria", "password": creds["doc_maria"]}, proxies=SIN_PROXY)
+    s.proxies = SIN_PROXY
+    m = re.search(r'name="csrf_token" value="([^"]+)"', s.get(f"{obj}/login").text)
+    s.post(f"{obj}/login", data={"usuario": "doc_maria", "password": creds["doc_maria"],
+                                 "csrf_token": m.group(1) if m else ""})
+    s.get(f"{obj}/avisos")     # la cookie final ya incluye el secreto del token CSRF
     cookie = f"session={s.cookies.get('session')}"
 
     zap(api, "/JSON/core/action/newSession/", name=a.etiqueta, overwrite="true")

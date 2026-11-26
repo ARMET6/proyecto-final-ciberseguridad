@@ -5,9 +5,14 @@ Correcciones respecto a app_vulnerable/app.py:
   1. SQL Injection -> consultas parametrizadas (?) y validación de longitud/caracteres.
   2. XSS           -> se quitó |safe (Jinja2 escapa por defecto), cabecera
                       Content-Security-Policy y cookie de sesión HttpOnly/SameSite.
-  3. IDOR / BOLA   -> función puede_ver_alumno(): un alumno solo accede a su propia
-                      matrícula; docentes y servicios escolares según su rol.
-                      Los intentos negados responden 403 y quedan en bitácora.
+  3. IDOR / BOLA   -> función puede_ver_alumno(), permisos por rol y responsabilidad:
+                      alumno = solo su matrícula; docente = solo sus alumnos asignados;
+                      servicios escolares = todos los expedientes; admin = gestión de
+                      cuentas, sin acceso a expedientes. Lo negado responde 403 y se registra.
+Controles adicionales (mejoras de la revisión final):
+  - Tokens CSRF (Flask-WTF) en todos los formularios que modifican información.
+  - CSP estricta: los estilos viven en static/estilos.css, sin 'unsafe-inline'.
+  - La cabecera Server ya no revela Werkzeug ni la versión de Python.
 Además (Actividad 5): bitácora de seguridad en JSON (logs/seguridad.log) y
 bloqueo temporal tras 5 intentos fallidos de inicio de sesión.
 
@@ -24,7 +29,9 @@ from datetime import datetime
 from pathlib import Path
 
 from flask import Flask, abort, g, jsonify, redirect, render_template, request, session, url_for
+from flask_wtf.csrf import CSRFError, CSRFProtect
 from werkzeug.security import check_password_hash
+from werkzeug.serving import WSGIRequestHandler
 
 BASE = Path(__file__).resolve().parent.parent
 DB_PATH = BASE / "instance" / "campus.db"
@@ -38,7 +45,9 @@ app.config.update(
     SESSION_COOKIE_SAMESITE="Lax",
     # En producción con TLS se activaría también: SESSION_COOKIE_SECURE=True
     MAX_CONTENT_LENGTH=16 * 1024,
+    WTF_CSRF_TIME_LIMIT=3600,          # el token CSRF vence en 1 hora
 )
+csrf = CSRFProtect(app)                # exige csrf_token en todo POST
 
 # ------------------------------------------------------------------ bitácora
 log = logging.getLogger("seguridad")
@@ -98,7 +107,7 @@ def version():
 @app.after_request
 def cabeceras_seguridad(resp):
     resp.headers["Content-Security-Policy"] = (
-        "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
+        "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; "
         "object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
     )
     resp.headers["X-Content-Type-Options"] = "nosniff"
@@ -125,13 +134,21 @@ def requiere_sesion():
 MATRICULA_RE = re.compile(r"^AL\d{8}$")
 
 
+def alumnos_asignados(u):
+    """Matrículas de los grupos que tiene asignados un docente."""
+    filas = db().execute("SELECT matricula FROM asignaciones WHERE docente = ?", (u["usuario"],))
+    return {f["matricula"] for f in filas}
+
+
 def puede_ver_alumno(u, matricula):
-    """Regla de autorización sobre el recurso solicitado (mínimo privilegio)."""
+    """Regla de autorización sobre el recurso solicitado (mínimo privilegio por rol)."""
     if u["rol"] == "alumno":
         return u["matricula"] == matricula          # solo su propio expediente
-    if u["rol"] in ("docente", "escolares"):
-        return True                                 # su función requiere consultar alumnos
-    return False
+    if u["rol"] == "docente":
+        return matricula in alumnos_asignados(u)    # solo alumnos de sus grupos
+    if u["rol"] == "escolares":
+        return True                                 # gestiona expedientes por su función
+    return False                                    # admin y cualquier rol nuevo: denegado
 
 
 def validar_matricula(matricula):
@@ -175,7 +192,7 @@ def login():
     return render_template("login.html", error=error)
 
 
-@app.route("/logout")
+@app.route("/logout", methods=["POST"])      # POST + token CSRF: otra página no puede cerrar la sesión
 def logout():
     evento("LOGOUT")
     session.clear()
@@ -196,7 +213,7 @@ def buscar():
     u = requiere_sesion()
     if not u:
         return redirect(url_for("login"))
-    if u["rol"] == "alumno":                     # un alumno no necesita el directorio
+    if u["rol"] not in ("docente", "escolares"):  # alumnos y admin no necesitan el directorio
         evento("ACCESO_DENEGADO", "WARNING", recurso="directorio de alumnos", rol=u["rol"])
         abort(403)
     q = request.args.get("q", "")[:50]
@@ -209,6 +226,9 @@ def buscar():
         "SELECT matricula, nombre, carrera FROM alumnos WHERE nombre LIKE ? ESCAPE '\\'",
         (f"%{q_like}%",),
     ).fetchall()
+    if u["rol"] == "docente":                     # el docente solo ve a sus alumnos asignados
+        propios = alumnos_asignados(u)
+        filas = [f for f in filas if f["matricula"] in propios]
     return render_template("buscar.html", u=u, q=q, filas=filas, error=None)
 
 
@@ -266,7 +286,27 @@ def api_calificaciones(matricula):
     return jsonify(matricula=matricula, calificaciones=[dict(f) for f in filas])
 
 
+# Administración: gestiona cuentas, nunca ve expedientes ------------------------------------
+@app.route("/admin/usuarios")
+def admin_usuarios():
+    u = requiere_sesion()
+    if not u:
+        return redirect(url_for("login"))
+    if u["rol"] != "admin":
+        evento("ACCESO_DENEGADO", "ALERT", recurso="administración de usuarios", rol=u["rol"])
+        abort(403)
+    cuentas = db().execute("SELECT usuario, rol, nombre FROM usuarios ORDER BY rol, usuario").fetchall()
+    evento("ADMIN_CONSULTA", "WARNING", recurso="lista de usuarios")   # toda acción de admin queda registrada
+    return render_template("admin.html", u=u, cuentas=cuentas)
+
+
 # ------------------------------------------------------------------ errores sin detalles internos
+@app.errorhandler(CSRFError)
+def csrf_rechazado(e):
+    evento("CSRF_RECHAZADO", "ALERT", motivo=e.description)
+    return "Solicitud rechazada: falta el token CSRF o no es válido", 400
+
+
 @app.errorhandler(400)
 def e400(_e):
     return "Solicitud inválida", 400
@@ -289,5 +329,14 @@ def e500(_e):
     return "Error interno", 500
 
 
+class ServidorSinVersion(WSGIRequestHandler):
+    """El servidor de desarrollo anuncia 'Werkzeug/x.y Python/x.y' en la cabecera Server.
+    Se reemplaza por un nombre genérico para no revelar versiones.
+    En producción se usaría Gunicorn detrás de Nginx con server_tokens off."""
+
+    def version_string(self):
+        return "PortalEscolar"
+
+
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5001, debug=False)
+    app.run(host="127.0.0.1", port=5001, debug=False, request_handler=ServidorSinVersion)

@@ -1,2 +1,4 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Los scripts de Linux deben conservar saltos de linea LF aunque el repo se use en Windows
+*.sh  text eol=lf
+*.nft text eol=lf
+*.py  text eol=lf
